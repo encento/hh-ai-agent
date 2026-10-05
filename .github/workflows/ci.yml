@@ -16,6 +16,8 @@ jobs:
       - run: pip install -r requirements.txt -r requirements-dev.txt
       - run: python -m compileall .
       - run: pytest -q
+        env:
+          PYTHONPATH: .
 
   dashboard:
     runs-on: ubuntu-latest
