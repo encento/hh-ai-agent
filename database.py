@@ -1068,6 +1068,29 @@ class Database:
             )
             return cursor.rowcount
 
+    def list_vacancies(
+        self,
+        *,
+        status: str | None = None,
+        limit: int = 100,
+        offset: int = 0,
+    ) -> list[Vacancy]:
+        """Return vacancies for the local dashboard, newest first."""
+        limit = max(1, min(limit, 500))
+        offset = max(0, offset)
+        with self._connect() as connection:
+            if status:
+                rows = connection.execute(
+                    "SELECT * FROM vacancies WHERE status = ? ORDER BY discovered_at DESC LIMIT ? OFFSET ?",
+                    (status, limit, offset),
+                ).fetchall()
+            else:
+                rows = connection.execute(
+                    "SELECT * FROM vacancies ORDER BY discovered_at DESC LIMIT ? OFFSET ?",
+                    (limit, offset),
+                ).fetchall()
+            return [self._vacancy(row) for row in rows]
+
     def pending(self) -> list[Vacancy]:
         with self._connect() as connection:
             return [
