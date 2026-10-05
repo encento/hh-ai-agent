@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 
 type Vacancy = {
@@ -77,7 +78,10 @@ export default function Home() {
           <h1>HH Job Agent</h1>
           <p className="subtitle">Робот воюет с роботами. Ты смотришь только на исключения.</p>
         </div>
-        <button className="refresh" onClick={load}>Обновить</button>
+        <div className="actions">
+          <Link className="refresh link-button" href="/settings">Настройки</Link>
+          <button className="refresh" onClick={load}>Обновить</button>
+        </div>
       </div>
 
       <section className="grid">
@@ -85,7 +89,7 @@ export default function Home() {
         <div className="card"><div className="label">На проверке</div><div className="value">{status.pending_approval || 0}</div></div>
         <div className="card"><div className="label">Откликнулись</div><div className="value">{status.applied || 0}</div></div>
         <div className="card"><div className="label">Сегодня</div><div className="value">{stats?.applied_today ?? 0}</div></div>
-        <div className="card"><div className="label">Осталось слотов</div><div className="value">{stats?.available_application_slots ?? 0}</div></div>
+        <div className="card"><div className="label">Можно ещё откликнуться</div><div className="value">{stats?.available_application_slots ?? 0}</div></div>
       </section>
 
       <div className="toolbar">
