@@ -12,7 +12,9 @@ RESTART_EXIT_CODE = 75
 
 def main() -> int:
     while True:
-        process = subprocess.Popen([sys.executable, "main.py"], cwd=BASE_DIR)
+        env = dict(__import__("os").environ)
+        env["AGENT_SUPERVISED"] = "1"
+        process = subprocess.Popen([sys.executable, "main.py"], cwd=BASE_DIR, env=env)
         code = process.wait()
         if code != RESTART_EXIT_CODE:
             return code
