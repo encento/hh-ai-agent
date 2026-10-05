@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import os
+import threading
 from dataclasses import asdict
 from typing import Any
 
@@ -10,6 +11,7 @@ from pydantic import BaseModel, Field
 from approval import ApprovalService
 from config import Settings
 from database import Database, Vacancy
+from settings_store import SettingsStore
 
 
 class CoverLetterUpdate(BaseModel):
@@ -27,7 +29,8 @@ def create_api_app(
     database: Database,
     approval_service: ApprovalService,
 ) -> FastAPI:
-    app = FastAPI(title="HH Job Agent Local API", version="0.1.0")
+    app = FastAPI(title="HH Job Agent Local API", version="0.2.0")
+    settings_store = SettingsStore()
     api_key = os.environ.get("AGENT_API_KEY", "").strip()
     if not api_key:
         raise RuntimeError("AGENT_API_KEY is required when AGENT_API_ENABLED=true")
@@ -39,6 +42,28 @@ def create_api_app(
     @app.get("/health")
     async def health() -> dict[str, str]:
         return {"status": "ok"}
+
+
+    @app.get("/api/settings", dependencies=[Depends(require_key)])
+    async def get_settings() -> dict[str, Any]:
+        return settings_store.public()
+
+    @app.put("/api/settings", dependencies=[Depends(require_key)])
+    async def save_settings(body: dict[str, Any]) -> dict[str, Any]:
+        try:
+            return settings_store.update(body)
+        except ValueError as exc:
+            raise HTTPException(status_code=422, detail=str(exc)) from exc
+
+    @app.post("/api/system/restart", dependencies=[Depends(require_key)])
+    async def restart_agent() -> dict[str, Any]:
+        if os.environ.get("AGENT_SUPERVISED") != "1":
+            raise HTTPException(
+                status_code=409,
+                detail="restart_requires_launcher: run python launcher.py",
+            )
+        threading.Timer(0.6, lambda: os._exit(75)).start()
+        return {"ok": True, "message": "restarting"}
 
     @app.get("/api/stats", dependencies=[Depends(require_key)])
     async def stats() -> dict[str, Any]:
