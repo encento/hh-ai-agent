@@ -107,8 +107,9 @@ export default function SettingsPage() {
       <div className="top">
         <div>
           <Link href="/" className="back-link">← Dashboard</Link>
+          <div className="eyebrow">ПУЛЬТ УПРАВЛЕНИЯ БЕЗУМИЕМ</div>
           <h1>Настройки</h1>
-          <p className="subtitle">Все настройки самого агента хранятся на ноуте. Секреты назад во фронт не возвращаются.</p>
+          <p className="subtitle">Крутим ручки робота. Секреты остаются на ноуте, херню наружу не светим.</p>
         </div>
         <div className="actions">
           <button className="refresh" onClick={load} disabled={busy}>Сбросить изменения</button>
