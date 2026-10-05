@@ -73,15 +73,27 @@ export default function Home() {
 
   return (
     <main className="shell">
-      <div className="top">
+      <div className="top hero-top">
         <div>
+          <div className="eyebrow">VITYUSHA EMPLOYMENT MACHINE™</div>
           <h1>HH Job Agent</h1>
-          <p className="subtitle">Робот воюет с роботами. Ты смотришь только на исключения.</p>
+          <p className="subtitle">Робот воюет с роботами. Витюша занимается важными делами.</p>
+          <div className="meme-strip">
+            <span>ATS: 🤖</span>
+            <span>Мы: 🤖🪓</span>
+            <span>Статус: ищем хороших людей среди плохих вакансий</span>
+          </div>
         </div>
         <div className="actions">
           <Link className="refresh link-button" href="/settings">Настройки</Link>
           <button className="refresh" onClick={load}>Обновить</button>
         </div>
+      </div>
+
+      <div className="war-banner">
+        <strong>ОНИ ВСЕ УЁБКИ</strong>
+        <span>но где-то среди них точно есть нормальный оффер</span>
+        <em>ВИТЮША МОЛОДЕЦ</em>
       </div>
 
       <section className="grid">
