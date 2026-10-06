@@ -3,6 +3,7 @@ import argparse
 import asyncio
 import hashlib
 import logging
+import os
 import random
 import sys
 from collections import Counter
@@ -774,7 +775,7 @@ async def run(settings: Settings) -> None:
             mistral_keys.set_notifier(telegram.notify)
         if hasattr(telegram, "check_updates"):
             asyncio.create_task(telegram.check_updates(notify=True))
-        await asyncio.gather(
+        tasks = [
             telegram.start_polling(),
             agent_loop(
                 settings,
@@ -785,7 +786,26 @@ async def run(settings: Settings) -> None:
                 control,
                 approval_service,
             ),
-        )
+        ]
+        if os.environ.get("AGENT_API_ENABLED", "false").strip().lower() == "true":
+            import uvicorn
+
+            from api_server import create_api_app
+
+            api_host = os.environ.get("AGENT_API_HOST", "127.0.0.1").strip()
+            api_port = int(os.environ.get("AGENT_API_PORT", "8787"))
+            api_app = create_api_app(settings, database, approval_service)
+            api_config = uvicorn.Config(
+                api_app,
+                host=api_host,
+                port=api_port,
+                log_level="warning",
+                access_log=False,
+            )
+            api_server = uvicorn.Server(api_config)
+            tasks.append(api_server.serve())
+            logger.info("dashboard_api_started host=%s port=%s", api_host, api_port)
+        await asyncio.gather(*tasks)
     finally:
         try:
             if telegram is not None:
