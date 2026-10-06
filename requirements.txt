@@ -11,3 +11,5 @@ PyYAML==6.0.3
 pillow>=10.0.0
 fastapi==0.115.12
 uvicorn==0.34.2
+
+tzdata>=2025.2
